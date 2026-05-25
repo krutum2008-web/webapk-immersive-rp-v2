@@ -1,6 +1,19 @@
 Name: Build Android APK
 
 On:
+name: Build APK
+
+on:
+  # เพิ่มบรรทัดนี้เข้าไป เพื่อให้ปุ่ม Run workflow แสดงขึ้นมา
+  workflow_dispatch:
+
+  # ส่วนอันนี้คือ Trigger เดิมของคุณ (ถ้ามี เช่น ทำงานเมื่อ push)
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # ... โค้ดเดิมของคุณด้านล่าง ...
+
   Push:
     Branches: [ main ]
   Workflow_dispatch:
