@@ -1,4 +1,4 @@
-Name: Build Android APK
+name: Build Android APK
 
 on:
   push:
@@ -27,24 +27,5 @@ jobs:
           chmod +x ./gradlew
 
       - name: Build debug APK
-        run: bash ./gradlew assembleDebug --no-daemon
-
-      - name: Upload debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Immersive-RP-v2-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
-          retention-days: 30
-
-      - name: Build release APK (unsigned)
-        run: bash ./gradlew assembleRelease --no-daemon
-        continue-on-error: true
-
-      - name: Upload release APK (unsigned)
-        uses: actions/upload-artifact@v4
-        with:
-          name: Immersive-RP-v2-release-apk
-          path: app/build/outputs/apk/release/*.apk
-          retention-days: 30
-        continue-on-error: true
+        run: ./gradlew assembleDebug
 
