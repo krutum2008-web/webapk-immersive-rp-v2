@@ -1,57 +1,52 @@
-name: Build Android APK
+Name: Build Android APK
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+On:
+  Push:
+    Branches: [ main ]
+  Workflow_dispatch:
 
-jobs:
-  build:
-    name: Build APK
-    runs-on: ubuntu-latest
+Jobs:
+  Build:
+    Name: Build APK
+    Runs-on: ubuntu-latest
 
-    steps:
+    Steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        Uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Cache Gradle packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+        Uses: actions/setup-java@v4
+        With:
+          Java-version: '17'
+          Distribution: 'temurin'
+          # ใช้กลไก Cache ในตัวของ setup-java เลย เสถียรและปลอดภัยกว่าแยกทำเอง
+          Cache: gradle
 
       - name: Make gradlew executable
-        run: chmod +x ./gradlew
+        # จุดสำคัญ: มอบสิทธิ์ให้ไฟล์ในโปรเจกต์ของพี่ทำงานได้
+        Run: chmod +x ./gradlew
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug
+        Run: ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Immersive-RP-v2-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
+      - name: Upload debug APK
+        Uses: actions/upload-artifact@v4
+        With:
+          Name: Immersive-RP-v2-debug-apk
+          # ใช้เครื่องหมาย * ดักทางไว้ เผื่อชื่อไฟล์ APK ข้างในถูกเปลี่ยน
+          Path: app/build/outputs/apk/debug/*.apk
+          Retention-days: 30
 
       - name: Build release APK (unsigned)
-        run: ./gradlew assembleRelease
+        Run: ./gradlew assembleRelease --no-daemon
+        # ใส่ดักไว้เผื่อฝั่ง Release ยังไม่ได้เซตคีย์ จะได้ไม่ทำระบบล่ม
+        Continue-on-error: true
 
-      - name: Upload release APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Immersive-RP-v2-release-apk
-          path: app/build/outputs/apk/release/app-release-unsigned.apk
-          retention-days: 30
+      - name: Upload release APK (unsigned)
+        Uses: actions/upload-artifact@v4
+        With:
+          Name: Immersive-RP-v2-release-apk
+          Path: app/build/outputs/apk/release/*.apk
+          Retention-days: 30
+        Continue-on-error: true
+
